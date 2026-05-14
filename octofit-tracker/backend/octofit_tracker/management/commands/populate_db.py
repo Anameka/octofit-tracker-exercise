@@ -5,6 +5,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         self.stdout.write("Populating test data for OctoFit Tracker...")
-        self.stdout.write("Creating users: Mona, Octocat...")
-        self.stdout.write("Creating activities: Running, Yoga...")
+        self.stdout.write("Creating users, teams, and activities...")
         self.stdout.write(self.style.SUCCESS('Successfully populated test data'))
