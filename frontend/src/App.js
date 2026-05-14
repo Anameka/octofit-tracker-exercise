@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
-const leaderboard = [
-  {rank: 1, name: 'Mia Rivera', team: 'Team Kraken', points: 1420, trend: '+12%', activity: 'Running'},
-  {rank: 2, name: 'Noah Chen', team: 'FitSquad', points: 1310, trend: '+9%', activity: 'Cycling'},
-  {rank: 3, name: 'Sofia Kim', team: 'WaveRiders', points: 1250, trend: '+14%', activity: 'Strength'},
-  {rank: 4, name: 'Leo Patel', team: 'Octo Crew', points: 1180, trend: '+7%', activity: 'Yoga'},
-  {rank: 5, name: 'Avery Brooks', team: 'AquaFit', points: 1125, trend: '+11%', activity: 'Rowing'},
+const initialLeaderboard = [
+  {rank: 1, name: 'Mia Rivera', team: 'Team Kraken', points: 1420, trend: '+12%', activity: 'Running', dailySteps: 8600},
+  {rank: 2, name: 'Noah Chen', team: 'FitSquad', points: 1310, trend: '+9%', activity: 'Cycling', dailySteps: 7400},
+  {rank: 3, name: 'Sofia Kim', team: 'WaveRiders', points: 1250, trend: '+14%', activity: 'Strength', dailySteps: 6900},
+  {rank: 4, name: 'Leo Patel', team: 'Octo Crew', points: 1180, trend: '+7%', activity: 'Yoga', dailySteps: 5200},
+  {rank: 5, name: 'Avery Brooks', team: 'AquaFit', points: 1125, trend: '+11%', activity: 'Rowing', dailySteps: 6100},
 ];
 
 const profiles = [
@@ -16,6 +16,43 @@ const profiles = [
 ];
 
 function App() {
+  const [leaderboard, setLeaderboard] = useState(initialLeaderboard);
+  const [selectedUser, setSelectedUser] = useState(initialLeaderboard[0].name);
+  const [stepCount, setStepCount] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
+
+  const handleStepSubmit = (event) => {
+    event.preventDefault();
+    const steps = Number(stepCount);
+
+    if (!selectedUser || !steps || steps <= 0) {
+      setStatusMessage('Please select a user and enter a valid step count.');
+      return;
+    }
+
+    setLeaderboard((current) => {
+      const updated = current.map((user) => {
+        if (user.name !== selectedUser) {
+          return user;
+        }
+
+        const pointsEarned = Math.floor(steps / 10);
+        return {
+          ...user,
+          points: user.points + pointsEarned,
+          dailySteps: user.dailySteps + steps,
+          trend: `+${pointsEarned}%`,
+        };
+      });
+
+      updated.sort((a, b) => b.points - a.points);
+      return updated.map((user, index) => ({ ...user, rank: index + 1 }));
+    });
+
+    setStatusMessage(`${selectedUser} logged ${steps.toLocaleString()} steps and earned ${Math.floor(steps / 10)} points.`);
+    setStepCount('');
+  };
+
   return (
     <div className="App">
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
@@ -83,6 +120,32 @@ function App() {
             <span className="section-chip">Fitness leaderboard</span>
           </div>
 
+          <div className="step-form-wrapper">
+            <form className="step-form" onSubmit={handleStepSubmit}>
+              <div className="form-row">
+                <label htmlFor="userSelect">Choose user</label>
+                <select id="userSelect" value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)}>
+                  {leaderboard.map((user) => (
+                    <option key={user.name} value={user.name}>{user.name} — {user.team}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-row">
+                <label htmlFor="stepInput">Daily steps</label>
+                <input
+                  id="stepInput"
+                  type="number"
+                  min="0"
+                  placeholder="Enter steps"
+                  value={stepCount}
+                  onChange={(e) => setStepCount(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="btn btn-primary">Log Steps</button>
+            </form>
+            {statusMessage && <p className="form-status">{statusMessage}</p>}
+          </div>
+
           <div className="table-responsive">
             <table className="leaderboard-table">
               <thead>
@@ -91,17 +154,19 @@ function App() {
                   <th>Player</th>
                   <th>Team</th>
                   <th>Points</th>
+                  <th>Steps</th>
                   <th>Activity</th>
                   <th>Trend</th>
                 </tr>
               </thead>
               <tbody>
                 {leaderboard.map((item) => (
-                  <tr key={item.rank}>
+                  <tr key={item.name}>
                     <td>{item.rank}</td>
                     <td>{item.name}</td>
                     <td>{item.team}</td>
                     <td>{item.points}</td>
+                    <td>{item.dailySteps.toLocaleString()}</td>
                     <td>{item.activity}</td>
                     <td className={item.trend.startsWith('+') ? 'trend positive' : 'trend negative'}>{item.trend}</td>
                   </tr>
