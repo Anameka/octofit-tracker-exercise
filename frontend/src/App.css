@@ -1,0 +1,35 @@
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+.card {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border: none;
+}
+
+.card-title {
+  color: #1f883d;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.btn-primary {
+  background-color: #1f883d;
+  border-color: #1f883d;
+}
+
+.btn-primary:hover {
+  background-color: #187d2a;
+  border-color: #187d2a;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
